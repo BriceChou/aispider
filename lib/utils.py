@@ -1,6 +1,11 @@
+import sys
 import scipy.misc
 import numpy as np
 from models.model_handler import *
+
+# We need to solve the Chinese language issues
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 try:
     import dlib
@@ -19,7 +24,7 @@ simple_predictor = dlib.shape_predictor(simple_predictor_model)
 cnn_detection_model = get_cnn_detector_model()
 cnn_detector = dlib.cnn_face_detection_model_v1(cnn_detection_model)
 
-dlib_model = get_dlib_model_location()
+dlib_model = get_dlib_model()
 face_encoder = dlib.face_recognition_model_v1(dlib_model)
 
 def get_picture_array(picture_path, mode='RGB'):
