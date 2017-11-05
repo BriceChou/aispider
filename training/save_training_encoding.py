@@ -23,7 +23,9 @@ cache_path = os.path.abspath(father_path + '/cache')
 
 cache_file_path = os.path.abspath(cache_path + '/cache.hdf5')
 
-filewt = h5py.File(cache_file_path, 'w')
+fid = h5py.File(cache_file_path, 'r+')
+
+pictures_list = []
 
 
 def get_file_name(file_path):
@@ -31,12 +33,25 @@ def get_file_name(file_path):
     return os.path.splitext(file_path)[0].split('/')[-1]
 
 
+def get_all_file_path():
+    for group in fid.keys():
+        all_attrs = fid[group]
+        for attr_name in all_attrs.keys():
+            print(all_attrs[attr_name].name)
+            print(all_attrs[attr_name].value)
+            # if 'file_paths' == all_attrs[attr_name].name.split('/')[-1]:
+            # pictures_list.append()
+
+
+get_all_file_path()
+
+quit()
+
 for file in os.listdir(cache_path):
     file_path = os.path.join(cache_path, file)
     if re.match('^.*\.(jpg|gif|png|bmp)(?i)', file_path):
         image = load_image_file(file_path)
         encodings_mat = face_encodings(image)[0]
         label = get_file_name(file_path)
-        filewt.create_dataset(label, data=encodings_mat)
 
-filewt.close()
+fid.close()

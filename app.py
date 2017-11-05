@@ -24,7 +24,7 @@ training_eigenvalues = []
 process_this_frame = True
 
 for key in filerd.keys():
-    training_names.append(filerd[key].name)
+    training_names.append(filerd[key].name.split('/')[-1])
     training_eigenvalues.append(filerd[key].value)
 
 filerd.close()
@@ -54,6 +54,7 @@ while True:
         for face_encoding in face_ens:
             # See if the face is a match for the known face(s)
             match = compare_faces(training_eigenvalues, face_encoding)
+            print(match)
             get_face_names(match, face_names)
 
     process_this_frame = not process_this_frame
