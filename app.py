@@ -72,11 +72,11 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left - 50, bottom + 30),
-                      (right + 50, bottom - 10), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (left - 60, bottom + 30),
+                      (right + 60, bottom - 10), (0, 0, 255), cv2.FILLED)
 
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left - 30, bottom + 20),
+        cv2.putText(frame, name, (left - 50, bottom + 20),
                     font, 1, (255, 255, 255), 1)
 
     # Display the resulting image
