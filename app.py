@@ -56,8 +56,9 @@ while True:
             for face_encoding in face_ens:
                 # See if the face is a match for the known face(s)
                 face_names = compare_faces(
-                    training_eigenvalues, training_names, face_encoding, 0.5,
+                    training_eigenvalues, training_names, face_encoding, 0.4,
                     detected_face_length)
+                print(face_names)
         else:
             face_names = ['Unkown']
 
