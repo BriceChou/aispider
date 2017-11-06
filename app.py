@@ -41,19 +41,20 @@ while True:
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
         face_locs = face_locations(small_frame)
-        face_ens = face_encodings(small_frame, face_locs)
+        face_ens = face_encodings(
+            small_frame, face_locs, 1, training_model='small')
         face_names = []
 
         # How manay faces in the screen
         detected_face_length = len(face_ens)
-        print('We detected ' + str(detected_face_length) +
-              ' faces in the screen.')
+        print('We detected \033[0;32m' + str(detected_face_length) +
+              '\033[0m faces in the screen.')
 
         if detected_face_length >= 1:
             for face_encoding in face_ens:
                 # See if the face is a match for the known face(s)
-                name = compare_faces(
-                    training_eigenvalues, training_names, face_encoding, 0.3)
+                name = compare_faces(training_eigenvalues,
+                                     training_names, face_encoding, 0.4035)
                 face_names.append(name)
 
     process_this_frame = not process_this_frame
@@ -71,11 +72,12 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35),
-                      (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (left - 50, bottom + 30),
+                      (right + 50, bottom - 10), (0, 0, 255), cv2.FILLED)
+
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6),
-                    font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left - 30, bottom + 20),
+                    font, 1, (255, 255, 255), 1)
 
     # Display the resulting image
     cv2.namedWindow('T2M', cv2.WINDOW_GUI_EXPANDED)

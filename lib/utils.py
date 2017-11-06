@@ -222,17 +222,19 @@ def face_landmarks(face_image, face_locations=None):
     } for points in landmarks_as_tuples]
 
 
-def face_encodings(face_image, known_face_locations=None, num_jitters=1):
+def face_encodings(face_image, known_face_locations=None, num_jitters=1, training_model="small"):
     """
     Given an image, return the 128-dimension face encoding for each face in the image.
 
     :param face_image: The image that contains one or more faces
     :param known_face_locations: Optional - the bounding boxes of each face if you already know them.
     :param num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
+
+    training_model : small or large
     :return: A list of 128-dimentional face encodings (one for each face in the image)
     """
     raw_landmarks = _raw_face_landmarks(
-        face_image, known_face_locations, model="small")
+        face_image, known_face_locations, training_model)
 
     return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) for raw_landmark_set in raw_landmarks]
 
@@ -257,8 +259,15 @@ def compare_faces(known_face_encodings, known_face_names,
     get_match_index = map(match_list.index, heapq.nsmallest(1, match_list))
 
     for index in list(get_match_index):
+        print('\nCurrent min distance value is \033[0;32m' +
+              str(match_list[index]) + '\033[0m and who name is \033[0;32m' +
+              str(known_face_names[index]) + '\033[0m.\n')
         if match_list[index] <= tolerance:
             face_name = re.match('\D*', known_face_names[index]).group()
+            print('\033[0;32m' + face_name +
+                  '\033[0m was found in distance_array\033[0;32m[' +
+                  str(index) + ']\033[0m and distance value is \033[0;32m' +
+                  str(match_list[index]) + '\033[0m.\n')
         else:
             face_name = 'Unknown'
 
