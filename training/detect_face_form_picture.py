@@ -24,47 +24,72 @@ cache_file_path = os.path.abspath(cache_path + '/cache.hdf5')
 
 filewt = h5py.File(cache_file_path, 'w')
 
+# Store the all pictures
 pictures_list = []
 
 
-def get_file_path_form_dir(path, list):
+def get_file_path_form_dir(path, store_list):
     for file in os.listdir(path):
         file_path = os.path.join(path, file)
         temp = []
         if os.path.isdir(file_path):
             get_file_path_form_dir(file_path, temp)
-            list.append(temp)
+            store_list.append(temp)
         elif re.match('^.*\.(jpg|gif|png|bmp)(?i)', file_path):
-            list.append(file_path)
+            store_list.append(file_path)
 
 
 get_file_path_form_dir(data_path, pictures_list)
 
-for list in pictures_list:
-    i = 0
-    folder_name = os.path.dirname(list[0]).split('/')[-1]
-    group = filewt.create_group(folder_name + '/file_paths')
-    for file_path in list:
+
+""""
+pictures_list:
+[
+  [biben1.jpg, biden2.jpg],
+  [obama1.jpg, obama2.jpg, obama3.jpg]
+  [brice1.jpg]
+]
+
+"""
+
+for picture_list in pictures_list:
+    # i = 0
+    # TODO: We should save the picture's path and file into database
+    folder_name = os.path.dirname(picture_list[0]).split('/')[-1]
+    # group = filewt.create_group(folder_name + '/file_paths')
+    for file_path in picture_list:
         image = load_image_file(file_path)
+
+        # Get one picture's face locations
         locations = face_locations(
             image, number_of_times_to_upsample=0, model="hog")
-        i += 1
-        list = []
+        # i += 1
+        temp_list = []
         for location in locations:
             top, right, bottom, left = location
             face_image = image[top:bottom, left:right]
             pil_image = Image.fromarray(face_image)
+
+            # TODO: We should support the more images training
+            # output_path = os.path.abspath(
+            #     father_path + '/cache/' + folder_name + str(i) + '.jpg')
+
+            # Save the picture inside face into other folder
             output_path = os.path.abspath(
-                father_path + '/cache/' + folder_name + str(i) + '.jpg')
-            list.append(output_path)
+                father_path + '/cache/' + folder_name + '.jpg')
+            temp_list.append(output_path)
+
+            # Save the face image to a new picture
             pil_image.save(output_path)
-        for file_path in list:
+
+        # Print new image's path
+        for file_path in temp_list:
             print(file_path + ' was saved.')
 
         # Save the file's path into group
-        group[folder_name + '/file_paths'].create_dataset()
+        # group[folder_name + '/file_paths'].create_dataset()
 
-filewt.close()
+# filewt.close()
 
 """"
 bricechou

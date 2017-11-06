@@ -29,23 +29,9 @@ pictures_list = []
 
 
 def get_file_name(file_path):
-    print(file_path + ' encondings saved.')
+    print(file_path + ' encondings value was saved.')
     return os.path.splitext(file_path)[0].split('/')[-1]
 
-
-def get_all_file_path():
-    for group in fid.keys():
-        all_attrs = fid[group]
-        for attr_name in all_attrs.keys():
-            print(all_attrs[attr_name].name)
-            print(all_attrs[attr_name].value)
-            # if 'file_paths' == all_attrs[attr_name].name.split('/')[-1]:
-            # pictures_list.append()
-
-
-get_all_file_path()
-
-quit()
 
 for file in os.listdir(cache_path):
     file_path = os.path.join(cache_path, file)
@@ -53,5 +39,9 @@ for file in os.listdir(cache_path):
         image = load_image_file(file_path)
         encodings_mat = face_encodings(image)[0]
         label = get_file_name(file_path)
+        fid.create_dataset(label, data=encodings_mat)
+
+for attr in fid.keys():
+    print('new attrs name: ' + fid[attr].name)
 
 fid.close()

@@ -27,6 +27,7 @@ cnn_detector = dlib.cnn_face_detection_model_v1(cnn_detection_model)
 dlib_model = get_dlib_model()
 face_encoder = dlib.face_recognition_model_v1(dlib_model)
 
+
 def get_picture_array(picture_path, mode='RGB'):
     """
     To get an picture file's numpy array
@@ -38,6 +39,7 @@ def get_picture_array(picture_path, mode='RGB'):
       picture's numpy array
     """
     return scipy.misc.imread(picture_path, mode=mode)
+
 
 def get_picture_locations(picture_numpy_array, loop_times=1, handler_model="hog"):
     """
@@ -55,6 +57,7 @@ def get_picture_locations(picture_numpy_array, loop_times=1, handler_model="hog"
         return [_trim_css_to_bounds(_rect_to_css(face.rect), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample, "cnn")]
     else:
         return [_trim_css_to_bounds(_rect_to_css(face), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample, model)]
+
 
 def _rect_to_css(rect):
     """
@@ -170,7 +173,8 @@ def batch_face_locations(images, number_of_times_to_upsample=1, batch_size=128):
     def convert_cnn_detections_to_css(detections):
         return [_trim_css_to_bounds(_rect_to_css(face.rect), images[0].shape) for face in detections]
 
-    raw_detections_batched = _raw_face_locations_batched(images, number_of_times_to_upsample)
+    raw_detections_batched = _raw_face_locations_batched(
+        images, number_of_times_to_upsample)
 
     return list(map(convert_cnn_detections_to_css, raw_detections_batched))
 
@@ -179,7 +183,8 @@ def _raw_face_landmarks(face_image, face_locations=None, model="large"):
     if face_locations is None:
         face_locations = _raw_face_locations(face_image)
     else:
-        face_locations = [_css_to_rect(face_location) for face_location in face_locations]
+        face_locations = [_css_to_rect(face_location)
+                          for face_location in face_locations]
 
     pose_predictor = complex_predictor
 
@@ -198,7 +203,8 @@ def face_landmarks(face_image, face_locations=None):
     :return: A list of dicts of face feature locations (eyes, nose, etc)
     """
     landmarks = _raw_face_landmarks(face_image, face_locations)
-    landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()] for landmark in landmarks]
+    landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()]
+                           for landmark in landmarks]
 
     # For a definition of each point index, see https://cdn-images-1.medium.com/max/1600/1*AbEg31EgkbXSQehuNJBlWg.png
     return [{
@@ -223,12 +229,14 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
     :param num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
     :return: A list of 128-dimentional face encodings (one for each face in the image)
     """
-    raw_landmarks = _raw_face_landmarks(face_image, known_face_locations, model="small")
+    raw_landmarks = _raw_face_landmarks(
+        face_image, known_face_locations, model="small")
 
     return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) for raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
+def compare_faces(known_face_encodings, known_face_names,
+                  face_encoding_to_check, tolerance=0.6, detected_face_length=1):
     """
     Compare a list of face encodings against a candidate encoding to see if they match.
 
@@ -237,4 +245,21 @@ def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
     :param tolerance: How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical best performance.
     :return: A list of True/False values indicating which known_face_encodings match the face encoding to check
     """
-    return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
+    match_list = []
+
+    face_names = []
+
+    print(face_distance(known_face_encodings, face_encoding_to_check))
+
+    match_list = list(face_distance(known_face_encodings,
+                                    face_encoding_to_check) <= tolerance)
+
+    for index, value in enumerate(match_list):
+        print(index, value)
+        if value:
+            face_names.append(known_face_names[index])
+
+    if len(face_names) < detected_face_length:
+        face_names.append('Unkown')
+
+    return face_names

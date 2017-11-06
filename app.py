@@ -27,15 +27,10 @@ for key in filerd.keys():
     training_names.append(filerd[key].name.split('/')[-1])
     training_eigenvalues.append(filerd[key].value)
 
+print(training_names)
+print(training_eigenvalues)
+
 filerd.close()
-
-
-def get_face_names(match, names_in_frame):
-    for index, value in enumerate(match):
-            if value:
-                names_in_frame.append(training_names[index])
-            else:
-                names_in_frame.append('Unknown')
 
 
 while True:
@@ -51,11 +46,20 @@ while True:
         face_locs = face_locations(small_frame)
         face_ens = face_encodings(small_frame, face_locs)
         face_names = []
-        for face_encoding in face_ens:
-            # See if the face is a match for the known face(s)
-            match = compare_faces(training_eigenvalues, face_encoding)
-            print(match)
-            get_face_names(match, face_names)
+
+        # How manay faces in the screen
+        detected_face_length = len(face_ens)
+        print('We detected ' + str(detected_face_length) +
+              ' faces in the screen.')
+
+        if detected_face_length >= 1:
+            for face_encoding in face_ens:
+                # See if the face is a match for the known face(s)
+                face_names = compare_faces(
+                    training_eigenvalues, training_names, face_encoding, 0.5,
+                    detected_face_length)
+        else:
+            face_names = ['Unkown']
 
     process_this_frame = not process_this_frame
 
