@@ -1,5 +1,7 @@
+import re
 import sys
 import scipy.misc
+import heapq
 import numpy as np
 from models.model_handler import *
 
@@ -236,7 +238,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
 
 
 def compare_faces(known_face_encodings, known_face_names,
-                  face_encoding_to_check, tolerance=0.6, detected_face_length=1):
+                  face_encoding_to_check, tolerance=0.6):
     """
     Compare a list of face encodings against a candidate encoding to see if they match.
 
@@ -247,19 +249,17 @@ def compare_faces(known_face_encodings, known_face_names,
     """
     match_list = []
 
-    face_names = []
-
     print(face_distance(known_face_encodings, face_encoding_to_check))
 
     match_list = list(face_distance(known_face_encodings,
-                                    face_encoding_to_check) <= tolerance)
+                                    face_encoding_to_check))
 
-    for index, value in enumerate(match_list):
-        print(index, value)
-        if value:
-            face_names.append(known_face_names[index])
+    get_match_index = map(match_list.index, heapq.nsmallest(1, match_list))
 
-    if len(face_names) < detected_face_length:
-        face_names.append('Unkown')
+    for index in list(get_match_index):
+        if match_list[index] <= tolerance:
+            face_name = re.match('\D*', known_face_names[index]).group()
+        else:
+            face_name = 'Unknown'
 
-    return face_names
+    return face_name

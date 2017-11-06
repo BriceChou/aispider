@@ -27,9 +27,6 @@ for key in filerd.keys():
     training_names.append(filerd[key].name.split('/')[-1])
     training_eigenvalues.append(filerd[key].value)
 
-print(training_names)
-print(training_eigenvalues)
-
 filerd.close()
 
 
@@ -55,19 +52,16 @@ while True:
         if detected_face_length >= 1:
             for face_encoding in face_ens:
                 # See if the face is a match for the known face(s)
-                face_names = compare_faces(
-                    training_eigenvalues, training_names, face_encoding, 0.4,
-                    detected_face_length)
-                print(face_names)
-        else:
-            face_names = ['Unkown']
+                name = compare_faces(
+                    training_eigenvalues, training_names, face_encoding, 0.3)
+                face_names.append(name)
 
     process_this_frame = not process_this_frame
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locs, face_names):
         # Scale back up face locations
-        # since the frame we detected in was scaled to 1/4 size
+        #   since the frame we detected in was scaled to 1/4 size
         top *= 4
         right *= 4
         bottom *= 4
