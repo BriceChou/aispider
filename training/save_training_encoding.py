@@ -5,33 +5,11 @@ import h5py
 
 # Extend on our system's path and can load the other folder's file
 sys.path.append('..')
-
-# We need to solve the Chinese language issues
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 from lib.utils import load_image_file, face_encodings, face_locations
 
-# Get current file's path
-pwd = os.getcwd()
-
-# Get project's path
-father_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + '.')
-
-# Get data's path
-data_path = os.path.abspath(father_path + '/data')
-
-cache_path = os.path.abspath(father_path + '/cache')
-
-cache_file_path = os.path.abspath(cache_path + '/cache.hdf5')
-
-print('\033[0;31m%s\033[0m' % cache_file_path + ' was removed.\n')
-os.remove(cache_file_path)
-
-fid = h5py.File(cache_file_path, 'w')
-
-# Store the all pictures
-pictures_list = []
+# Use the utf-8 coded format
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 def get_file_path_form_dir(path, store_list):
@@ -41,6 +19,7 @@ def get_file_path_form_dir(path, store_list):
         if os.path.isdir(file_path):
             get_file_path_form_dir(file_path, temp)
             store_list.append(temp)
+
         # Load all files with .jpg, .png etc type
         # If we want to load file with .jpg or .JPG type file,
         # we could change the regular expression to
@@ -49,13 +28,31 @@ def get_file_path_form_dir(path, store_list):
             store_list.append(file_path)
 
 
-get_file_path_form_dir(data_path, pictures_list)
-
-
 def get_file_name(file_path):
     print(file_path + ' encondings value was saved.')
     return os.path.splitext(file_path)[0].split('/')[-1]
 
+
+# Get current file's path
+pwd = os.getcwd()
+
+# Get project's path
+project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + '.')
+
+# Get data's path
+data_path = os.path.abspath(project_path + '/data')
+
+cache_file_path = os.path.abspath(project_path + '/cache/cache.hdf5')
+
+print('\033[0;31m%s\033[0m' % cache_file_path + ' was removed.\n')
+os.remove(cache_file_path)
+
+fid = h5py.File(cache_file_path, 'w')
+
+# Store the all pictures
+pictures_list = []
+
+get_file_path_form_dir(data_path, pictures_list)
 
 for picture_list in pictures_list:
     i = 0
@@ -66,15 +63,14 @@ for picture_list in pictures_list:
 
         try:
             # Get one picture's face locations
-            locations = face_locations(
-                image, number_of_times_to_upsample=1, model="cnn")
+            locations = face_locations(image, 1, 'cnn')
             encodings_mat = face_encodings(image, locations, 10, 'large')[0]
 
             file_label = folder_name + str(i)
             file_path_label = file_label + '_path'
+
             # Save the image locations into database
             fid.create_dataset(file_label, data=encodings_mat)
-            # fid.create_dataset(file_path_label, data=file_path)
             print(file_path_label +
                   ': \033[0;32m%s\033[0m' % file_path +
                   ' was saved.\n')
@@ -82,5 +78,4 @@ for picture_list in pictures_list:
             error_info = 'Save ' + file_path + ' Error: ' + str(e) + '\n'
             print('\033[0;31m%s\033[0m' % error_info)
             continue
-
 fid.close()

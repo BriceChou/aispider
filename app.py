@@ -1,8 +1,14 @@
 import sys
-import cv2
-import h5py
 import os
 from lib.utils import face_locations, compare_faces, face_encodings
+
+try:
+    import cv2
+    import h5py
+except Exception as e:
+    error_info = 'Please install cv2/h5py tools first. Error: ' + str(e) + '\n'
+    print('\033[0;31m%s\033[0m' % error_info)
+    quit()
 
 # We need to solve the Chinese language issues
 reload(sys)
@@ -16,6 +22,10 @@ cache_file_path = os.path.abspath('cache/cache.hdf5')
 filerd = h5py.File(cache_file_path, 'r')
 
 # Initialize some variables
+i = 1
+# counts = 1
+# tiemout = 1000
+
 face_names = []
 
 screen_locations = []
@@ -32,10 +42,6 @@ for key in filerd.keys():
 
 filerd.close()
 
-i = 1
-# counts = 1
-# tiemout = 1000
-
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
@@ -48,7 +54,7 @@ while True:
         # Find all the faces and face encodings in the current frame of video
         screen_locations = face_locations(small_frame)
         screen_encodings = face_encodings(
-            small_frame, screen_locations, 1, training_model='small')
+            small_frame, screen_locations, 1, 'small')
         face_names = []
 
         # How manay faces in the screen
@@ -58,7 +64,7 @@ while True:
 
         if detected_face_length >= 1:
             for screen_encoding in screen_encodings:
-                # See if the face is a match for the known face(s)
+                # Compare the locations and get the face's name
                 name = compare_faces(training_eigenvalues,
                                      training_names, screen_encoding, 0.4035)
                 face_names.append(name)
@@ -67,8 +73,7 @@ while True:
 
     # Display the results
     for (top, right, bottom, left), name in zip(screen_locations, face_names):
-        # Scale back up face locations
-        #   since the frame we detected in was scaled to 1/4 size
+        # We detected in was scaled to 1/4 size
         top *= 4
         right *= 4
         bottom *= 4
