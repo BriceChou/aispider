@@ -68,13 +68,13 @@ for picture_list in pictures_list:
             # Get one picture's face locations
             locations = face_locations(
                 image, number_of_times_to_upsample=1, model="cnn")
-            encodings_mat = face_encodings(image, locations, 3, 'large')[0]
+            encodings_mat = face_encodings(image, locations, 10, 'large')[0]
 
             file_label = folder_name + str(i)
             file_path_label = file_label + '_path'
             # Save the image locations into database
             fid.create_dataset(file_label, data=encodings_mat)
-            fid.create_dataset(file_path_label, data=file_path)
+            # fid.create_dataset(file_path_label, data=file_path)
             print(file_path_label +
                   ': \033[0;32m%s\033[0m' % file_path +
                   ' was saved.\n')

@@ -16,11 +16,14 @@ cache_file_path = os.path.abspath('cache/cache.hdf5')
 filerd = h5py.File(cache_file_path, 'r')
 
 # Initialize some variables
-face_locs = []
-face_ens = []
 face_names = []
+
+screen_locations = []
+screen_encodings = []
+
 training_names = []
 training_eigenvalues = []
+
 process_this_frame = True
 
 for key in filerd.keys():
@@ -29,6 +32,9 @@ for key in filerd.keys():
 
 filerd.close()
 
+i = 1
+# counts = 1
+# tiemout = 1000
 
 while True:
     # Grab a single frame of video
@@ -40,27 +46,27 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        face_locs = face_locations(small_frame)
-        face_ens = face_encodings(
-            small_frame, face_locs, 1, training_model='small')
+        screen_locations = face_locations(small_frame)
+        screen_encodings = face_encodings(
+            small_frame, screen_locations, 1, training_model='small')
         face_names = []
 
         # How manay faces in the screen
-        detected_face_length = len(face_ens)
+        detected_face_length = len(screen_encodings)
         print('We detected \033[0;32m' + str(detected_face_length) +
               '\033[0m faces in the screen.')
 
         if detected_face_length >= 1:
-            for face_encoding in face_ens:
+            for screen_encoding in screen_encodings:
                 # See if the face is a match for the known face(s)
                 name = compare_faces(training_eigenvalues,
-                                     training_names, face_encoding, 0.4035)
+                                     training_names, screen_encoding, 0.4035)
                 face_names.append(name)
 
     process_this_frame = not process_this_frame
 
     # Display the results
-    for (top, right, bottom, left), name in zip(face_locs, face_names):
+    for (top, right, bottom, left), name in zip(screen_locations, face_names):
         # Scale back up face locations
         #   since the frame we detected in was scaled to 1/4 size
         top *= 4
@@ -83,8 +89,16 @@ while True:
     cv2.namedWindow('T2M', cv2.WINDOW_GUI_EXPANDED)
     cv2.imshow('T2M', frame)
 
-    # Hit 'q' on the keyboard to quit!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # We could use timeout to make a scrrenshot
+    # if 0 == counts%tiemout:
+    #     cv2.imwrite('cache/' + str(i) + '.jpg', frame)
+    # counts += 1
+
+    key = cv2.waitKey(10)
+    if key == ord('s'):
+        cv2.imwrite('cache/' + str(i) + '.jpg', frame)
+        i = i + 1
+    elif key == ord('q'):
         break
 
 # Release handle to the webcam
