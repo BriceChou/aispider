@@ -47,7 +47,7 @@ while True:
     ret, frame = video_capture.read()
 
     # Resize frame of video to 1/4 size for faster face recognition processing
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
     # Only process every other frame of video to save time
     if process_this_frame:
@@ -68,27 +68,29 @@ while True:
                 name = compare_faces(training_eigenvalues,
                                      training_names, screen_encoding, 0.4035)
                 face_names.append(name)
+                cv2.imwrite('cache/' + str(i) + '.jpg', frame)
+                i += 1
 
     process_this_frame = not process_this_frame
 
     # Display the results
     for (top, right, bottom, left), name in zip(screen_locations, face_names):
-        # We detected in was scaled to 1/4 size
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
+        # We detected in was scaled to 1/2 size
+        top *= 2
+        right *= 2
+        bottom *= 2
+        left *= 2
 
         # Draw a box around the face
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-        # Draw a label with a name below the face
-        cv2.rectangle(frame, (left - 60, bottom + 30),
-                      (right + 60, bottom - 10), (0, 0, 255), cv2.FILLED)
-
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left - 50, bottom + 20),
-                    font, 1, (255, 255, 255), 1)
+        if '' != name:
+            # Draw a label with a name below the face
+            cv2.rectangle(frame, (left - 60, bottom + 30),
+                          (right + 60, bottom - 10), (0, 0, 255), cv2.FILLED)
+            font = cv2.FONT_HERSHEY_DUPLEX
+            cv2.putText(frame, name, (left - 50, bottom + 20),
+                        font, 1, (255, 255, 255), 1)
 
     # Display the resulting image
     cv2.namedWindow('T2M', cv2.WINDOW_GUI_EXPANDED)

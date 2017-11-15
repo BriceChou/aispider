@@ -118,7 +118,7 @@ def face_encodings(face_image, known_face_locations=None,
 
 def compare_faces(known_face_encodings, known_face_names,
                   face_encoding_to_check, tolerance=0.6):
-    face_name = 'Unknown'
+    face_name = ''
 
     match_list = []
 

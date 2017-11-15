@@ -63,8 +63,8 @@ for picture_list in pictures_list:
 
         try:
             # Get one picture's face locations
-            locations = face_locations(image, 1, 'cnn')
-            encodings_mat = face_encodings(image, locations, 10, 'large')[0]
+            locations = face_locations(image, 1, 'hog')
+            encodings_mat = face_encodings(image, locations, 10, 'small')[0]
 
             file_label = folder_name + str(i)
             file_path_label = file_label + '_path'

@@ -13,7 +13,7 @@ def delete_files(path):
         for name in files:
             if name.endswith('.jpg'):
                 os.remove(os.path.join(root, name))
-    print(os.path.join(root, name) + ' was removed.')
+                print(os.path.join(root, name) + ' was removed.')
 
 
 def get_file_path_form_dir(path, store_list):
@@ -49,10 +49,11 @@ for picture_list in pictures_list:
     i = 0
     folder_name = os.path.dirname(picture_list[0]).split('/')[-1]
     for file_path in picture_list:
+        print(file_path)
         image = load_image_file(file_path)
 
         # Get one picture's face locations
-        locations = face_locations(image, 1, 'cnn')
+        locations = face_locations(image, 1, 'hog')
         i += 1
         for location in locations:
             top, right, bottom, left = location
