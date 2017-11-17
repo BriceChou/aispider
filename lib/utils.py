@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 import scipy.misc
 import heapq
@@ -141,3 +142,24 @@ def compare_faces(known_face_encodings, known_face_names,
                   str(match_list[index]) + '\033[0m.\n')
 
     return face_name
+
+
+def _save_the_number_into_list(path, store_list):
+    for file in os.listdir(path):
+        file_path = os.path.join(path, file)
+        temp = []
+        if os.path.isdir(file_path):
+            _save_the_number_into_list(file_path, temp)
+            store_list.append(temp)
+        elif re.match('^.*\.(jpg|gif|png|bmp)(?i)', file_path):
+            number = int(re.findall('\d+', file_path)[-1])
+            store_list.append(number)
+
+
+def get_file_max_number(folder_path):
+    list = []
+    _save_the_number_into_list(folder_path, list)
+    if 0 == len(list):
+        return 1
+    else:
+        return max(list)

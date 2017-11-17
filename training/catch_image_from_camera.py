@@ -4,7 +4,7 @@ import time
 
 # Extend on our system's path and can load the other folder's file
 sys.path.append('..')
-from lib.utils import face_locations, compare_faces, face_encodings
+from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
 
 try:
     import cv2
@@ -16,7 +16,6 @@ except Exception as e:
 # We need to solve the Chinese language issues
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 
 # Get current file's path
 pwd = os.getcwd()
@@ -31,7 +30,8 @@ cache_path = os.path.abspath(project_path + '/cache')
 video_capture = cv2.VideoCapture(0)
 
 # Initialize some variables
-i = 1
+i = get_file_max_number(cache_path)
+
 screen_locations = []
 screen_encodings = []
 

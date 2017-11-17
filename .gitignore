@@ -5,5 +5,4 @@
 data/
 cache/
 *.log
-./*.jpg
-
+*.jpg

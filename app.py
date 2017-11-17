@@ -1,6 +1,6 @@
 import sys
 import os
-from lib.utils import face_locations, compare_faces, face_encodings
+from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
 
 try:
     import cv2
@@ -19,10 +19,13 @@ video_capture = cv2.VideoCapture(0)
 
 cache_file_path = os.path.abspath('cache/cache.hdf5')
 
+unknown_path = os.path.abspath('unknown')
+
 filerd = h5py.File(cache_file_path, 'r')
 
 # Initialize some variables
-i = 1
+i = get_file_max_number(unknown_path)
+
 # counts = 1
 # tiemout = 1000
 
@@ -66,10 +69,11 @@ while True:
             for screen_encoding in screen_encodings:
                 # Compare the locations and get the face's name
                 name = compare_faces(training_eigenvalues,
-                                     training_names, screen_encoding, 0.4035)
+                                     training_names, screen_encoding, 0.3)
                 face_names.append(name)
-                cv2.imwrite('cache/' + str(i) + '.jpg', frame)
-                i += 1
+                if '' == name:
+                    cv2.imwrite(unknown_path + '/' + str(i) + '.jpg', frame)
+                    i += 1
 
     process_this_frame = not process_this_frame
 
