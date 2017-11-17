@@ -4,7 +4,7 @@ import time
 
 # Extend on our system's path and can load the other folder's file
 sys.path.append('..')
-from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
+from lib.utils import face_locations, face_encodings, get_file_max_number
 
 try:
     import cv2

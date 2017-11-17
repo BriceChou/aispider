@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
 
 try:
@@ -72,7 +72,9 @@ while True:
                                      training_names, screen_encoding, 0.3)
                 face_names.append(name)
                 if '' == name:
-                    cv2.imwrite(unknown_path + '/' + str(i) + '.jpg', frame)
+                    # Save the unknown images
+                    img_file_path = unknown_path + '/' + str(i) + '.jpg'
+                    cv2.imwrite(img_file_path, frame)
                     i += 1
 
     process_this_frame = not process_this_frame
