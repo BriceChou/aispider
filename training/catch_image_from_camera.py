@@ -26,8 +26,8 @@ project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + '.')
 # Get data's and cache's path
 cache_path = os.path.abspath(project_path + '/cache')
 
-# Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(0)
+# Get a reference to webcam #-1 (the last one)
+video_capture = cv2.VideoCapture(-1)
 
 # Initialize some variables
 i = get_file_max_number(cache_path)

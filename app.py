@@ -15,8 +15,8 @@ except Exception as e:
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-# Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(0)
+# Get a reference to webcam #-1 (the last one)
+video_capture = cv2.VideoCapture(-1)
 
 cache_file_path = os.path.abspath('cache/cache.hdf5')
 
