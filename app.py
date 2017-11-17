@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
 
 try:
@@ -76,6 +77,7 @@ while True:
                     img_file_path = unknown_path + '/' + str(i) + '.jpg'
                     cv2.imwrite(img_file_path, frame)
                     i += 1
+                    time.sleep(0.15)
 
     process_this_frame = not process_this_frame
 
@@ -99,7 +101,9 @@ while True:
                         font, 1, (255, 255, 255), 1)
 
     # Display the resulting image
-    cv2.namedWindow('T2M', cv2.WINDOW_GUI_EXPANDED)
+    cv2.namedWindow('T2M', cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty('T2M', cv2.WND_PROP_FULLSCREEN,
+                          cv2.WINDOW_FULLSCREEN)
     cv2.imshow('T2M', frame)
 
     # We could use timeout to make a scrrenshot
@@ -107,7 +111,7 @@ while True:
     #     cv2.imwrite('cache/' + str(i) + '.jpg', frame)
     # counts += 1
 
-    key = cv2.waitKey(10)
+    key = cv2.waitKey(1)
     if key == ord('s'):
         cv2.imwrite('cache/' + str(i) + '.jpg', frame)
         i = i + 1

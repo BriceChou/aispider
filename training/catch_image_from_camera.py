@@ -60,12 +60,14 @@ while True:
     process_this_frame = not process_this_frame
 
     # Display the resulting image
-    cv2.namedWindow('T2M', cv2.WINDOW_GUI_EXPANDED)
+    cv2.namedWindow('T2M', cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty('T2M', cv2.WND_PROP_FULLSCREEN,
+                          cv2.WINDOW_FULLSCREEN)
     cv2.imshow('T2M', frame)
 
     time.sleep(0.1)
 
-    if cv2.waitKey(10) == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 # Release handle to the webcam
