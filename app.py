@@ -114,7 +114,7 @@ while True:
     key = cv2.waitKey(1)
     if key == ord('s'):
         cv2.imwrite('cache/' + str(i) + '.jpg', frame)
-        i = i + 1
+        i += 1
     elif key == ord('q'):
         break
 
