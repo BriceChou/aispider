@@ -1,40 +1,31 @@
 import os
-import sys
+import lib
 import time
-from lib.utils import face_locations, compare_faces, face_encodings, get_file_max_number
 
 try:
     import cv2
     import h5py
 except Exception as e:
-    error_info = 'Please install cv2/h5py tools first. Error: ' + str(e) + '\n'
+    error_info = 'Please install h5py/cv2 tools first. Error: {}.\n'.format(e)
     print('\033[0;31m%s\033[0m' % error_info)
     quit()
-
-# We need to solve the Chinese language issues
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 # Get a reference to webcam #-1 (the last one)
 video_capture = cv2.VideoCapture(-1)
 
-cache_file_path = os.path.abspath('cache/cache.hdf5')
-
-unknown_path = os.path.abspath('unknown')
-
-filerd = h5py.File(cache_file_path, 'r')
-
 # Initialize some variables
-i = get_file_max_number(unknown_path)
+unknown_folder_path = os.path.abspath('unknown')
+i = lib.get_file_max_number(unknown_folder_path)
+filerd = h5py.File('./database/training_encodings.hdf5', 'r')
 
-# counts = 1
-# tiemout = 1000
-
+# Temp to save predict result name
 face_names = []
 
+# Save the screen locations and encodings to find a person
 screen_locations = []
 screen_encodings = []
 
+# Save the training data from database
 training_names = []
 training_eigenvalues = []
 
@@ -56,25 +47,25 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        screen_locations = face_locations(small_frame)
-        screen_encodings = face_encodings(
+        screen_locations = lib.face_locations(small_frame)
+        screen_encodings = lib.face_encodings(
             small_frame, screen_locations, 1, 'small')
         face_names = []
 
         # How manay faces in the screen
         detected_face_length = len(screen_encodings)
-        print('We detected \033[0;32m' + str(detected_face_length) +
-              '\033[0m faces in the screen.')
-
+        info = 'We detected \033[0;32m{}\033[0m faces in the screen.\n'
+        print(info.format(detected_face_length))
         if detected_face_length >= 1:
             for screen_encoding in screen_encodings:
                 # Compare the locations and get the face's name
-                name = compare_faces(training_eigenvalues,
-                                     training_names, screen_encoding, 0.3)
+                name = lib.compare_faces(training_eigenvalues,
+                                         training_names, screen_encoding, 0.5)
                 face_names.append(name)
+
+                # Auto save the unknown images
                 if '' == name:
-                    # Save the unknown images
-                    img_file_path = unknown_path + '/' + str(i) + '.jpg'
+                    img_file_path = unknown_folder_path + '/' + str(i) + '.jpg'
                     cv2.imwrite(img_file_path, frame)
                     i += 1
                     time.sleep(0.15)
@@ -95,7 +86,8 @@ while True:
         if '' != name:
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left - 60, bottom + 30),
-                          (right + 60, bottom - 10), (0, 0, 255), cv2.FILLED)
+                          (right + 60, bottom - 10), (0, 0, 255),
+                          cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left - 50, bottom + 20),
                         font, 1, (255, 255, 255), 1)
@@ -105,11 +97,6 @@ while True:
     cv2.setWindowProperty('T2M', cv2.WND_PROP_FULLSCREEN,
                           cv2.WINDOW_FULLSCREEN)
     cv2.imshow('T2M', frame)
-
-    # We could use timeout to make a scrrenshot
-    # if 0 == counts%tiemout:
-    #     cv2.imwrite('cache/' + str(i) + '.jpg', frame)
-    # counts += 1
 
     key = cv2.waitKey(1)
     if key == ord('s'):

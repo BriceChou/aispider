@@ -1,9 +1,9 @@
 import re
-import scipy.misc
 import heapq
+import models
+import scipy.misc
 import numpy as np
 from collections import Counter
-from models.model_handler import *
 
 try:
     import dlib
@@ -16,22 +16,23 @@ _enable_debug = False
 
 # Load all detector models
 face_detector = dlib.get_frontal_face_detector()
-cnn_detection_model = get_cnn_detector_model()
+cnn_detection_model = models.get_cnn_detector_model()
 cnn_detector = dlib.cnn_face_detection_model_v1(cnn_detection_model)
 
 # Load all predictor models
-complex_predictor_model = get_complex_predictor_model()
+complex_predictor_model = models.get_complex_predictor_model()
 complex_predictor = dlib.shape_predictor(complex_predictor_model)
-simple_predictor_model = get_simple_predictor_model()
+simple_predictor_model = models.get_simple_predictor_model()
 simple_predictor = dlib.shape_predictor(simple_predictor_model)
 
 # Load dlib image encoder models
-dlib_model = get_dlib_model()
+dlib_model = models.get_dlib_model()
 face_encoder = dlib.face_recognition_model_v1(dlib_model)
 
 
 def _debug(str):
-    if _enable_debug: print('%s\n' % str)
+    if _enable_debug:
+        print('%s\n' % str)
 
 
 def _rect_to_css(rect):
@@ -159,7 +160,8 @@ def compare_faces(known_face_encodings, known_face_names,
         if match_list[index] <= tolerance:
             face_name = re.match('\D*', known_face_names[index]).group()
             face_list.append(face_name)
-            name_info = ('\033[0;32m{}\033[0m was found in distance_array\033[0;32m[{}]\033[0m'
+            name_info = ('\033[0;32m{}\033[0m was found in '
+                         'distance_array\033[0;32m[{}]\033[0m'
                          ' and distance value is \033[0;32m{}\033[0m.')
             _debug(name_info.format(face_name, index, match_list[index]))
 
@@ -173,9 +175,14 @@ def compare_faces(known_face_encodings, known_face_names,
         # If we get different name from our database,
         # we should also use the default one to display.
         if name_frequency_number == 1:
-            face_name = re.match('\D*', known_face_names[min_match_index]).group()
-        elif most_possible_name: face_name = most_possible_name
-        else: face_name = ''
-    else: face_name = re.match('\D*', known_face_names[min_match_index]).group()
+            face_name = re.match('\D*',
+                                 known_face_names[min_match_index]).group()
+        elif most_possible_name:
+            face_name = most_possible_name
+        else:
+            face_name = ''
+    else:
+        face_name = re.match('\D*',
+                             known_face_names[min_match_index]).group()
 
     return face_name
