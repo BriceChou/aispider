@@ -33,6 +33,7 @@ face_encoder = dlib.face_recognition_model_v1(dlib_model)
 def _debug(str):
     if _enable_debug: print('%s\n' % str)
 
+
 def _rect_to_css(rect):
     return rect.top(), rect.right(), rect.bottom(), rect.left()
 
@@ -174,6 +175,7 @@ def compare_faces(known_face_encodings, known_face_names,
         if name_frequency_number == 1:
             face_name = re.match('\D*', known_face_names[min_match_index]).group()
         elif most_possible_name: face_name = most_possible_name
+        else: face_name = ''
     else: face_name = re.match('\D*', known_face_names[min_match_index]).group()
 
     return face_name
