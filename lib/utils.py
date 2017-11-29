@@ -1,36 +1,37 @@
 import re
-import os
-import sys
 import scipy.misc
 import heapq
 import numpy as np
+from collections import Counter
 from models.model_handler import *
-
-# We need to solve the Chinese language issues
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 try:
     import dlib
 except Exception as e:
-    error_info = 'Please install dlib tools first. Error: ' + str(e) + '\n'
+    error_info = 'Please install dlib tools first. Error: {}.\n'.format(e)
     print('\033[0;31m%s\033[0m' % error_info)
     quit()
 
+_enable_debug = False
+
+# Load all detector models
 face_detector = dlib.get_frontal_face_detector()
-
-complex_predictor_model = get_complex_predictor_model()
-complex_predictor = dlib.shape_predictor(complex_predictor_model)
-
-simple_predictor_model = get_simple_predictor_model()
-simple_predictor = dlib.shape_predictor(simple_predictor_model)
-
 cnn_detection_model = get_cnn_detector_model()
 cnn_detector = dlib.cnn_face_detection_model_v1(cnn_detection_model)
 
+# Load all predictor models
+complex_predictor_model = get_complex_predictor_model()
+complex_predictor = dlib.shape_predictor(complex_predictor_model)
+simple_predictor_model = get_simple_predictor_model()
+simple_predictor = dlib.shape_predictor(simple_predictor_model)
+
+# Load dlib image encoder models
 dlib_model = get_dlib_model()
 face_encoder = dlib.face_recognition_model_v1(dlib_model)
 
+
+def _debug(str):
+    if _enable_debug: print('%s\n' % str)
 
 def _rect_to_css(rect):
     return rect.top(), rect.right(), rect.bottom(), rect.left()
@@ -41,7 +42,26 @@ def _css_to_rect(css):
 
 
 def _trim_css_to_bounds(css, image_shape):
-    return max(css[0], 0), min(css[1], image_shape[1]), min(css[2], image_shape[0]), max(css[3], 0)
+    return (max(css[0], 0), min(css[1], image_shape[1]),
+            min(css[2], image_shape[0]),
+            max(css[3], 0))
+
+
+def _raw_face_landmarks(face_image, face_locations=None, model='small'):
+    if face_locations is None:
+        face_locations = _raw_face_locations(face_image)
+    else:
+        face_locations = [_css_to_rect(face_location)
+                          for face_location in face_locations]
+
+    pose_predictor = simple_predictor
+
+    if model == 'large':
+        pose_predictor = complex_predictor
+
+    return [pose_predictor(face_image, face_location)
+            for face_location in
+            face_locations]
 
 
 def _raw_face_locations(img, number_of_times_to_upsample=1, model='hog'):
@@ -86,90 +106,74 @@ def face_locations(img, number_of_times_to_upsample=1, model='hog'):
         (top, right, bottom, left) order
     """
 
+    _face_locations_mat = _raw_face_locations(img,
+                                              number_of_times_to_upsample,
+                                              model)
     if model == 'cnn':
-        return [_trim_css_to_bounds(_rect_to_css(face.rect), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample, 'cnn')]
+        return [_trim_css_to_bounds(_rect_to_css(face.rect), img.shape)
+                for face in _face_locations_mat]
     else:
-        return [_trim_css_to_bounds(_rect_to_css(face), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample, model)]
-
-
-def _raw_face_landmarks(face_image, face_locations=None, model='small'):
-    if face_locations is None:
-        face_locations = _raw_face_locations(face_image)
-    else:
-        face_locations = [_css_to_rect(face_location) for face_location in face_locations]
-
-    pose_predictor = simple_predictor
-
-    if model == 'large':
-        pose_predictor = complex_predictor
-
-    return [
-        pose_predictor(face_image, face_location)
-        for face_location in
-        face_locations]
+        return [_trim_css_to_bounds(_rect_to_css(face), img.shape)
+                for face in _face_locations_mat]
 
 
 def face_encodings(face_image, known_face_locations=None,
                    num_jitters=1, training_model='small'):
-    raw_landmarks = _raw_face_landmarks(
+    _raw_landmarks = _raw_face_landmarks(
         face_image, known_face_locations, training_model)
 
-    return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) for raw_landmark_set in raw_landmarks]
+    return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters))
+            for raw_landmark_set in _raw_landmarks]
 
 
 def compare_faces(known_face_encodings, known_face_names,
                   face_encoding_to_check, tolerance=0.6):
+    """ Compare the face in the video
+
+    Args:
+        known_face_encodings: Training face encodings mat
+        known_face_names: Training face name list
+        face_encoding_to_check:
+        tolerance:
+
+    Returns:
+        predict this possible face name
+    """
+
     face_name = ''
-
     match_list = []
-
-    print(face_distance(known_face_encodings, face_encoding_to_check))
+    face_list = []
 
     match_list = list(face_distance(known_face_encodings,
                                     face_encoding_to_check))
 
-    get_match_index = map(match_list.index, heapq.nsmallest(1, match_list))
+    get_match_index = map(match_list.index, heapq.nsmallest(10, match_list))
+    min_match_index = get_match_index[0]
 
-    for index in list(get_match_index):
-        print('\nCurrent min distance value is \033[0;32m' +
-              str(match_list[index]) + '\033[0m and who name is \033[0;32m' +
-              str(known_face_names[index]) + '\033[0m.\n')
+    for index in get_match_index:
+        match_info = ('Current min distance value is \033[0;32m{}\033[0m'
+                      ' and who name is \033[0;32m{}\033[0m.')
+        _debug(match_info.format(match_list[index], known_face_names[index]))
+
         if match_list[index] <= tolerance:
             face_name = re.match('\D*', known_face_names[index]).group()
-            print('\033[0;32m' + face_name +
-                  '\033[0m was found in distance_array\033[0;32m[' +
-                  str(index) + ']\033[0m and distance value is \033[0;32m' +
-                  str(match_list[index]) + '\033[0m.\n')
+            face_list.append(face_name)
+            name_info = ('\033[0;32m{}\033[0m was found in distance_array\033[0;32m[{}]\033[0m'
+                         ' and distance value is \033[0;32m{}\033[0m.')
+            _debug(name_info.format(face_name, index, match_list[index]))
+
+    # If we only can get one name from our database,
+    # we should use the default one to display.
+    if face_list:
+        counter = Counter(face_list).most_common(1)
+        most_possible_name = counter[0][0]
+        name_frequency_number = counter[0][1]
+
+        # If we get different name from our database,
+        # we should also use the default one to display.
+        if name_frequency_number == 1:
+            face_name = re.match('\D*', known_face_names[min_match_index]).group()
+        elif most_possible_name: face_name = most_possible_name
+    else: face_name = re.match('\D*', known_face_names[min_match_index]).group()
 
     return face_name
-
-
-def _save_the_number_into_list(folder_path, store_list):
-    """
-    To save all file's number and find the max number from this list.
-
-    This function only suitable for LINUX system.
-
-    Args:
-
-    Returns:
-    """
-    for file in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file)
-        temp_list = []
-        if os.path.isdir(file_path):
-            _save_the_number_into_list(file_path, temp_list)
-            store_list.append(temp_list)
-        elif re.match('^.*\.(jpg|gif|png|bmp)(?i)', file_path):
-            image_name = os.path.basename(file_path)
-            number = 1
-            numbers = re.findall('\d+', image_name)
-            if len(numbers):
-                number = int(numbers[-1])
-            store_list.append(number)
-
-
-def get_file_max_number(folder_path):
-    temp_list = []
-    _save_the_number_into_list(folder_path, temp_list)
-    return max(temp_list)
