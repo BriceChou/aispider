@@ -1,7 +1,7 @@
 import re
 import os
 
-_enable_debug = False
+_enable_debug = True
 
 
 def _debug(str):
@@ -9,29 +9,16 @@ def _debug(str):
         print('%s\n' % str)
 
 
-def _save_the_number_into_list(folder_path, store_list):
-    """
-    To save all file's number and find the max number from this list.
+def _get_file_end_number(file_path):
+    image_name = os.path.basename(file_path)
 
-    This function only suitable for LINUX system.
-
-    Args:
-
-    Returns:
-    """
-    for file in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file)
-        temp_list = []
-        if os.path.isdir(file_path):
-            _save_the_number_into_list(file_path, temp_list)
-            store_list.append(temp_list)
-        elif re.match('^.*\.(jpg|gif|png|bmp)(?i)', file_path):
-            image_name = os.path.basename(file_path)
-            number = 1
-            numbers = re.findall('\d+', image_name)
-            if len(numbers):
-                number = int(numbers[-1])
-            store_list.append(number)
+    # If there is no any number,
+    # we should set the default of value with -1
+    number = -1
+    numbers = re.findall('\d+', image_name)
+    if numbers:
+        number = int(numbers[-1])
+    return number
 
 
 def get_file_name(file_path):
@@ -44,8 +31,8 @@ def get_file_type(file_path):
 
 def get_file_max_number(folder_path):
     temp_list = []
-    _save_the_number_into_list(folder_path, temp_list)
-    return max(temp_list)
+    get_image_path_from_folder(folder_path, temp_list, False)
+    return max([_get_file_end_number(path) for path in temp_list])
 
 
 def delete_files_by_type(folder_path, file_type):
@@ -56,7 +43,7 @@ def delete_files_by_type(folder_path, file_type):
                 _debug(os.path.join(root, name, ' was removed.'))
 
 
-def get_image_path_form_folder(folder_path, store_list,
+def get_image_path_from_folder(folder_path, store_list,
                                case_sensitive=True):
     """
     # Load all files with .jpg, .png etc type
@@ -64,26 +51,64 @@ def get_image_path_form_folder(folder_path, store_list,
     # we could change the regular expression to
     # '^.*\.(jpg|gif|png|bmp)(?i)'
     """
-    pattern = re.compile(r'^.*\.(jpg|gif|png|bmp)')
-    get_file_path_form_folder(folder_path, store_list,
-                              pattern, case_sensitive)
+    pattern_string = '^.*\.(jpg|gif|png|bmp)'
+    get_file_path_from_folder(folder_path, store_list,
+                              pattern_string, case_sensitive)
 
 
-def get_file_path_form_folder(folder_path, store_list,
-                              pattern, case_sensitive=True):
+def get_file_path_from_folder(folder_path, store_list,
+                              pattern_string, case_sensitive=True):
+    """ Get all folder's file
+    """
 
     if not case_sensitive:
-        pattern.join('(?i)')
+        pattern_string.join('(?i)')
 
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
-        temp = []
         if os.path.isdir(file_path):
-            get_file_path_form_folder(file_path, temp,
-                                      pattern, case_sensitive)
-            store_list.append(temp)
-        elif re.match(pattern, file_path):
+            get_file_path_from_folder(file_path, store_list,
+                                      pattern_string, case_sensitive)
+        elif re.match(r'%s' % pattern_string, file_path):
             store_list.append(file_path)
+
+
+def get_image_path_from_folder_group_by(folder_path, store_list,
+                                        case_sensitive=True):
+    """ Get all image's file and group it by folder name
+    """
+
+    pattern_string = '^.*\.(jpg|gif|png|bmp)'
+
+    if not case_sensitive:
+        pattern_string.join('(?i)')
+
+    for file in os.listdir(folder_path):
+        temp_list = []
+        file_path = os.path.join(folder_path, file)
+        if os.path.isdir(file_path):
+            get_file_path_from_folder(file_path, temp_list,
+                                      pattern_string, case_sensitive)
+            store_list.append(temp_list)
+        elif re.match(r'%s' % pattern_string, file_path):
+            store_list.append(file_path)
+
+
+def get_main_and_other_images(folder_path, main_image_list,
+                              other_image_list, case_sensitive=True):
+    """ Get all main image file
+    """
+    store_list = []
+    get_image_path_from_folder(folder_path, store_list,
+                               case_sensitive=True)
+
+    # Set the main image to the first position
+    for path in store_list:
+        image_name = os.path.basename(path)
+        if '1.jpg' == image_name:
+            main_image_list.append(path)
+        else:
+            other_image_list.append(path)
 
 
 def create_new_folder(folder_path):

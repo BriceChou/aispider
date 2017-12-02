@@ -12,7 +12,7 @@ except Exception as e:
     print('\033[0;31m%s\033[0m' % error_info)
     quit()
 
-_enable_debug = False
+_enable_debug = True
 
 # Load all detector models
 face_detector = dlib.get_frontal_face_detector()
@@ -142,7 +142,6 @@ def compare_faces(known_face_encodings, known_face_names,
         predict this possible face name
     """
 
-    face_name = ''
     match_list = []
     face_list = []
 
@@ -151,13 +150,14 @@ def compare_faces(known_face_encodings, known_face_names,
 
     get_match_index = map(match_list.index, heapq.nsmallest(10, match_list))
     min_match_index = get_match_index[0]
+    match_tolerance_range = tolerance + 0.5
 
     for index in get_match_index:
         match_info = ('Current min distance value is \033[0;32m{}\033[0m'
                       ' and who name is \033[0;32m{}\033[0m.')
         _debug(match_info.format(match_list[index], known_face_names[index]))
 
-        if match_list[index] <= tolerance:
+        if match_list[index] <= match_tolerance_range:
             face_name = re.match('\D*', known_face_names[index]).group()
             face_list.append(face_name)
             name_info = ('\033[0;32m{}\033[0m was found in '
@@ -165,24 +165,23 @@ def compare_faces(known_face_encodings, known_face_names,
                          ' and distance value is \033[0;32m{}\033[0m.')
             _debug(name_info.format(face_name, index, match_list[index]))
 
+    face_name = ''
+    min_match_tolerance = match_list[min_match_index]
+    min_known_face_name = re.match('\D*',
+                                   known_face_names[min_match_index]).group()
+
     # If we only can get one name from our database,
     # we should use the default one to display.
-    if face_list:
+    if len(face_list) > 1:
         counter = Counter(face_list).most_common(1)
         most_possible_name = counter[0][0]
         name_frequency_number = counter[0][1]
 
         # If we get different name from our database,
         # we should also use the default one to display.
-        if name_frequency_number == 1:
-            face_name = re.match('\D*',
-                                 known_face_names[min_match_index]).group()
-        elif most_possible_name:
+        if name_frequency_number > 1 and most_possible_name:
             face_name = most_possible_name
-        else:
-            face_name = ''
-    else:
-        face_name = re.match('\D*',
-                             known_face_names[min_match_index]).group()
+    elif min_match_tolerance <= tolerance:
+        face_name = min_known_face_name
 
     return face_name

@@ -49,7 +49,7 @@ while True:
         # Find all the faces and face encodings in the current frame of video
         screen_locations = lib.face_locations(small_frame)
         screen_encodings = lib.face_encodings(
-            small_frame, screen_locations, 1, 'small')
+            small_frame, screen_locations, 1, 'large')
         face_names = []
 
         # How manay faces in the screen
@@ -60,12 +60,12 @@ while True:
             for screen_encoding in screen_encodings:
                 # Compare the locations and get the face's name
                 name = lib.compare_faces(training_eigenvalues,
-                                         training_names, screen_encoding, 0.5)
+                                         training_names, screen_encoding, 0.3)
                 face_names.append(name)
 
                 # Auto save the unknown images
                 if '' == name:
-                    img_file_path = unknown_folder_path + '/' + str(i) + '.jpg'
+                    img_file_path = '{}/{}.jpg'.format(unknown_folder_path, i)
                     cv2.imwrite(img_file_path, frame)
                     i += 1
                     time.sleep(0.15)
@@ -100,7 +100,8 @@ while True:
 
     key = cv2.waitKey(1)
     if key == ord('s'):
-        cv2.imwrite('cache/' + str(i) + '.jpg', frame)
+        label = 'cache/{}.jpg'.format(i)
+        cv2.imwrite(label, frame)
         i += 1
     elif key == ord('q'):
         break
