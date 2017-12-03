@@ -21,13 +21,13 @@ other_image_list = []
 training_eigenvalues = []
 
 # Image encodings mode
-encodings_mode = 'small'
+encodings_mode = 'large'
 
 # For more complex mode you can set it to 'cnn'
 detector_mode = 'hog'
 
 # How many times to upsample the image looking for faces
-detect_times = 3
+detector_times = 1
 
 lib.get_main_and_other_images(data_folder_path, main_image_list,
                               other_image_list)
@@ -38,7 +38,7 @@ for image_path in main_image_list:
     main_folder_name = os.path.dirname(image_path).split('/')[-1]
     try:
         main_image = lib.load_image_file(image_path)
-        main_locations = lib.face_locations(main_image, detect_times,
+        main_locations = lib.face_locations(main_image, detector_times,
                                             detector_mode)
         main_image_ecoding = lib.face_encodings(main_image, main_locations,
                                                 3, encodings_mode)[0]
@@ -59,7 +59,7 @@ for file_path in other_image_list:
     image = lib.load_image_file(file_path)
     try:
         # Get one picture's face locations
-        locations = lib.face_locations(image, detect_times,
+        locations = lib.face_locations(image, detector_times,
                                        detector_mode)
         encodings_mat = lib.face_encodings(image, locations,
                                            3, encodings_mode)[0]
@@ -67,7 +67,7 @@ for file_path in other_image_list:
         file_path_label = '%s_path' % file_label
         tolerance = lib.face_distance(training_eigenvalues,
                                       encodings_mat)
-        if tolerance <= 0.6:
+        if tolerance <= 0.5:
             # Save the image locations into database
             lib.save_data(fid, file_label, encodings_mat)
             lib.save_image_max_index(fid, folder_name, i)
@@ -77,6 +77,6 @@ for file_path in other_image_list:
         continue
 
 for key in fid.keys():
-    print(key)
+    print(fid[key].name)
 
 fid.close()

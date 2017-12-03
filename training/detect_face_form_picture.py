@@ -18,7 +18,7 @@ cache_folder_path = os.path.abspath('../cache')
 detector_mode = 'hog'
 
 # How many times to upsample the image looking for faces
-detect_times = 3
+detect_times = 1
 
 # Store the all pictures path
 pictures_list = []
@@ -30,8 +30,9 @@ for picture_list in pictures_list:
 
     # Create a new folder to save the new image
     new_folder_path = os.path.join(cache_folder_path, folder_name)
-    i = lib.get_file_max_number(new_folder_path)
     lib.create_new_folder(new_folder_path)
+
+    i = lib.get_file_max_number(new_folder_path)
 
     for file_path in picture_list:
         image = lib.load_image_file(file_path)

@@ -32,7 +32,10 @@ def get_file_type(file_path):
 def get_file_max_number(folder_path):
     temp_list = []
     get_image_path_from_folder(folder_path, temp_list, False)
-    return max([_get_file_end_number(path) for path in temp_list])
+    if temp_list:
+        return max([_get_file_end_number(path) for path in temp_list])
+    else:
+        return -1
 
 
 def delete_files_by_type(folder_path, file_type):
