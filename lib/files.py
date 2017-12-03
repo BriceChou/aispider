@@ -67,6 +67,7 @@ def get_file_path_from_folder(folder_path, store_list,
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
         if os.path.isdir(file_path):
+            _debug(file_path.split('/')[-1])
             get_file_path_from_folder(file_path, store_list,
                                       pattern_string, case_sensitive)
         elif re.match(r'%s' % pattern_string, file_path):
@@ -89,7 +90,8 @@ def get_image_path_from_folder_group_by(folder_path, store_list,
         if os.path.isdir(file_path):
             get_file_path_from_folder(file_path, temp_list,
                                       pattern_string, case_sensitive)
-            store_list.append(temp_list)
+            if temp_list:
+                store_list.append(temp_list)
         elif re.match(r'%s' % pattern_string, file_path):
             store_list.append(file_path)
 
@@ -122,8 +124,8 @@ def create_new_folder(folder_path):
 
     if not isExists:
         os.makedirs(folder_path)
-        _debug('%s created success.' % folder_path)
+        _debug('\033[0;32m%s\033[0m created success.' % folder_path)
         return True
     else:
-        _debug('%s already created.' % folder_path)
+        _debug('\033[0;32m%s\033[0m already created.' % folder_path)
         return False

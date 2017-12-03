@@ -14,24 +14,31 @@ sys.setdefaultencoding('utf-8')
 data_folder_path = os.path.abspath('../data')
 cache_folder_path = os.path.abspath('../cache')
 
+# For more complex mode you can set it to 'cnn'
+detector_mode = 'hog'
+
+# How many times to upsample the image looking for faces
+detect_times = 3
+
 # Store the all pictures path
 pictures_list = []
 
 lib.get_image_path_from_folder_group_by(data_folder_path, pictures_list, False)
 
 for picture_list in pictures_list:
-    i = 0
     folder_name = os.path.dirname(picture_list[0]).split('/')[-1]
 
     # Create a new folder to save the new image
     new_folder_path = os.path.join(cache_folder_path, folder_name)
+    i = lib.get_file_max_number(new_folder_path)
     lib.create_new_folder(new_folder_path)
 
     for file_path in picture_list:
         image = lib.load_image_file(file_path)
 
         # Get one picture's face locations
-        locations = lib.face_locations(image, 3, 'hog')
+        locations = lib.face_locations(image, detect_times,
+                                       detector_mode)
         i += 1
         for location in locations:
             top, right, bottom, left = location

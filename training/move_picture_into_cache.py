@@ -23,8 +23,6 @@ i = lib.get_file_max_number(cache_folder_path)
 for image_path in pictures_list:
     i += 1
     folder_name = os.path.dirname(image_path).split('/')[-1]
-
-    print(folder_name)
     file_type = lib.get_file_type(image_path)
 
     # Move the picture into cache folder
