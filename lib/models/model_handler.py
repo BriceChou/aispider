@@ -1,3 +1,5 @@
+__author__ = 'Brice Chou'
+
 from pkg_resources import resource_filename
 
 def get_complex_predictor_model():

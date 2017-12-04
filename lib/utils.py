@@ -1,3 +1,5 @@
+__author__ = 'Brice Chou'
+
 import re
 import heapq
 import models
@@ -150,13 +152,9 @@ def compare_faces(known_face_encodings, known_face_names,
 
     get_match_index = map(match_list.index, heapq.nsmallest(10, match_list))
     min_match_index = get_match_index[0]
-    match_tolerance_range = tolerance + 0.5
+    match_tolerance_range = tolerance + 0.05
 
     for index in get_match_index:
-        match_info = ('Current min distance value is \033[0;32m{}\033[0m'
-                      ' and who name is \033[0;32m{}\033[0m.')
-        _debug(match_info.format(match_list[index], known_face_names[index]))
-
         if match_list[index] <= match_tolerance_range:
             face_name = re.match('\D*', known_face_names[index]).group()
             face_list.append(face_name)
@@ -172,7 +170,9 @@ def compare_faces(known_face_encodings, known_face_names,
 
     # If we only can get one name from our database,
     # we should use the default one to display.
-    if len(face_list) > 1:
+    if min_match_tolerance <= 0.3:
+        face_name = min_known_face_name
+    elif len(face_list) > 1:
         counter = Counter(face_list).most_common(1)
         most_possible_name = counter[0][0]
         name_frequency_number = counter[0][1]

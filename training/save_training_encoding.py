@@ -1,6 +1,8 @@
 import os
 import sys
 import h5py
+import time
+from PIL import Image
 
 # Use the utf-8 coded format
 reload(sys)
@@ -12,25 +14,34 @@ import lib
 
 # Get data folder path
 data_folder_path = os.path.abspath('../data')
+cache_folder_path = os.path.abspath('../cache')
 database_file_path = os.path.abspath('../database/training_encodings.hdf5')
+
 fid = h5py.File(database_file_path, 'a')
 
 # Store the all pictures
 main_image_list = []
 other_image_list = []
+
+# Store the main image encodings and names
+training_names = []
 training_eigenvalues = []
 
 # Image encodings mode
 encodings_mode = 'large'
 
 # For more complex mode you can set it to 'cnn'
-detector_mode = 'hog'
+detector_mode = 'cnn'
 
-# How many times to upsample the image looking for faces
+# How many times to upsample the image file
 detector_times = 1
+
+# How much distance between current faces to known faces
+min_tolerance = 0.5
 
 lib.get_main_and_other_images(data_folder_path, main_image_list,
                               other_image_list)
+
 
 # Save the main image encodings
 for image_path in main_image_list:
@@ -40,43 +51,79 @@ for image_path in main_image_list:
         main_image = lib.load_image_file(image_path)
         main_locations = lib.face_locations(main_image, detector_times,
                                             detector_mode)
-        main_image_ecoding = lib.face_encodings(main_image, main_locations,
-                                                3, encodings_mode)[0]
-        lib.save_data(fid, main_folder_name, main_image_ecoding)
+
+        locations_length = len(main_locations)
+        if locations_length > 1:
+            print('There is more than one face in %s' % image_path)
+        else:
+            main_image_ecoding = lib.face_encodings(main_image, None,
+                                                    2, encodings_mode)[0]
+            lib.save_data(fid, main_folder_name, main_image_ecoding)
     except Exception as e:
-        error_info = 'Save {} Error: {}.\n'.format(main_folder_name, e)
+        error_info = 'Save main image {}: {}.\n'.format(main_folder_name, e)
         print('\033[0;31m%s\033[0m' % error_info)
         continue
 
 # Get the main image encodings data
 for key in fid.keys():
     training_eigenvalues.append(fid[key].value)
+    training_names.append(fid[key].name.split('/')[-1])
 
 # Save the other image encodings data
 for file_path in other_image_list:
     folder_name = os.path.dirname(file_path).split('/')[-1]
-    i = lib.get_image_max_index(fid, folder_name)
     image = lib.load_image_file(file_path)
+    i = lib.get_max_index_from_list(file_path, training_names)
     try:
-        # Get one picture's face locations
         locations = lib.face_locations(image, detector_times,
                                        detector_mode)
-        encodings_mat = lib.face_encodings(image, locations,
-                                           3, encodings_mode)[0]
-        file_label = '{}{}'.format(folder_name, i)
-        file_path_label = '%s_path' % file_label
-        tolerance = lib.face_distance(training_eigenvalues,
-                                      encodings_mat)
-        if tolerance <= 0.5:
-            # Save the image locations into database
-            lib.save_data(fid, file_label, encodings_mat)
-            lib.save_image_max_index(fid, folder_name, i)
+        locations_length = len(locations)
+
+        if locations_length > 1:
+            print('There is more than one face in %s' % file_path)
+
+            # Create a new folder to save the new image
+            new_folder_path = os.path.join(cache_folder_path, folder_name)
+            lib.create_new_folder(new_folder_path)
+            j = lib.get_file_max_number(new_folder_path)
+
+            for location in locations:
+                top, right, bottom, left = location
+                right += 10
+                bottom += 10
+
+                face_image = image[top:bottom, left:right]
+                pil_image = Image.fromarray(face_image)
+
+                # Save the picture inside face into other folder
+                output_path = ('{}/{}{}.jpg').format(new_folder_path,
+                                                     folder_name, j)
+
+                # Save the face image to a new picture
+                pil_image.save(output_path)
+                j += 1
+                print('training \033[0;32m%s\033[0m was saved.' % output_path)
+        else:
+            encodings = lib.face_encodings(image, None,
+                                           2, encodings_mode)
+            for encoding in encodings:
+                i += 1
+                file_label = '{}{}'.format(folder_name, i)
+                name = lib.compare_faces(training_eigenvalues, training_names,
+                                         encoding, min_tolerance)
+
+                print('folder name is \033[0;32m%s\033[0m,'
+                      ' current name is \033[0;32m%s\033[0m' %
+                      (folder_name, name))
+                if folder_name == name:
+                    training_names.append(file_label)
+                    # Save the image locations into database
+                    lib.save_data(fid, file_label, encoding)
     except Exception as e:
-        error_info = 'Save {} Error: {}.\n'.format(file_path, e)
+        error_info = 'Save other image {}: {}.\n'.format(file_path, e)
         print('\033[0;31m%s\033[0m' % error_info)
         continue
 
-for key in fid.keys():
-    print(fid[key].name)
+lib.print_all_data_name(fid)
 
 fid.close()

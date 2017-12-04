@@ -4,8 +4,10 @@
 .idea/
 data/
 cache/
+database/
 *.log
 *.jpg
 *.JPG
 *.png
 *.bmp
+*.hdf5

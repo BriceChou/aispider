@@ -1,3 +1,5 @@
+__author__ = 'Brice Chou'
+
 import re
 import os
 
@@ -27,6 +29,10 @@ def get_file_name(file_path):
 
 def get_file_type(file_path):
     return '.%s' % file_path.split('.')[-1]
+
+
+def get_max_index_from_list(file_path, traget_list):
+    return max([_get_file_end_number(file_path) for path in traget_list])
 
 
 def get_file_max_number(folder_path):
@@ -70,7 +76,7 @@ def get_file_path_from_folder(folder_path, store_list,
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
         if os.path.isdir(file_path):
-            _debug(file_path.split('/')[-1])
+            _debug('folder name: %s' % file_path.split('/')[-1])
             get_file_path_from_folder(file_path, store_list,
                                       pattern_string, case_sensitive)
         elif re.match(r'%s' % pattern_string, file_path):

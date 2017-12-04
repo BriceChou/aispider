@@ -43,6 +43,9 @@ for picture_list in pictures_list:
         i += 1
         for location in locations:
             top, right, bottom, left = location
+            right += 10
+            bottom += 10
+
             face_image = image[top:bottom, left:right]
             pil_image = Image.fromarray(face_image)
 
