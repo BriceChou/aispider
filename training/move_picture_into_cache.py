@@ -29,8 +29,8 @@ def move(project_path=''):
         file_type = lib.get_file_type(image_path)
 
         # Move the picture into cache folder
-        output_path = '{}/{}{}.{}'.format(cache_folder_path,
-                                          folder_name, i, file_type)
+        output_path = '{}/{}{}.{}'.format(cache_folder_path, folder_name,
+                                          i, file_type)
         os.rename(image_path, output_path)
         # Print new image's path
         print('%s was saved.' % output_path)

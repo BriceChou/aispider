@@ -49,7 +49,7 @@ def save(project_path=''):
 
     # Save the main image encodings
     for image_path in main_image_list:
-        main_folder_name = os.path.dirname(image_path).split('/')[-1]
+        main_folder_name = lib.get_folder_name_by_file(image_path)
         start_index += 1
         try:
             main_image = lib.load_image_file(image_path)
@@ -65,9 +65,8 @@ def save(project_path=''):
                                                         2, encodings_mode)[0]
                 lib.save_data(fid, main_label, main_image_ecoding)
         except Exception as e:
-            error_info = 'Save main image {}: {}.\n'.format(
-                main_folder_name, e)
-            print('\033[0;31m%s\033[0m' % error_info)
+            error_info = '{}: \033[0;31m{}\033[0m.'.format(main_folder_name, e)
+            print('Save main image %s' % error_info)
             continue
 
     # Get the main image encodings data
@@ -93,6 +92,8 @@ def save(project_path=''):
                 lib.create_folder_with_path(new_folder_path)
                 j = lib.get_file_max_number(new_folder_path)
 
+                file_type = lib.get_file_type(file_path)
+
                 for location in locations:
                     top, right, bottom, left = location
                     right += 10
@@ -102,8 +103,9 @@ def save(project_path=''):
                     pil_image = Image.fromarray(face_image)
 
                     # Save the picture inside face into other folder
-                    output_path = ('{}/{}{}.jpg').format(new_folder_path,
-                                                         folder_name, j)
+                    output_path = '{}/{}{}.{}'.format(new_folder_path,
+                                                      folder_name, j,
+                                                      file_type)
 
                     # Save the face image to a new picture
                     pil_image.save(output_path)
@@ -128,8 +130,8 @@ def save(project_path=''):
                         # Save the image locations into database
                         lib.save_data(fid, file_label, encoding)
         except Exception as e:
-            error_info = 'Save other image {}: {}.\n'.format(file_path, e)
-            print('\033[0;31m%s\033[0m' % error_info)
+            error_info = '{}: \033[0;31m{}\033[0m.'.format(file_path, e)
+            print('Save other image %s' % error_info)
             continue
 
     lib.print_all_data_name(fid)

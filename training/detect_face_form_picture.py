@@ -40,6 +40,7 @@ def detect(project_path=''):
         i = lib.get_file_max_number(new_folder_path)
 
         for file_path in image_list:
+            file_type = lib.get_file_type(file_path)
             image = lib.load_image_file(file_path)
 
             # Get one picture's face locations
@@ -55,8 +56,8 @@ def detect(project_path=''):
                 pil_image = Image.fromarray(face_image)
 
                 # Save the picture inside face into other folder
-                output_path = ('{}/{}{}.jpg').format(new_folder_path,
-                                                     folder_name, i)
+                output_path = '{}/{}{}.{}'.format(new_folder_path, folder_name,
+                                                  i, file_type)
 
                 # Save the face image to a new picture
                 pil_image.save(output_path)

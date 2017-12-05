@@ -63,8 +63,8 @@ def rotate(project_path=''):
             i += 1
             file_type = lib.get_file_type(file_path)
             # Save the picture inside face into other folder
-            output_path = ('{}/{}{}.{}').format(folder_path, folder_name,
-                                                i, file_type)
+            output_path = '{}/{}{}.{}'.format(folder_path, folder_name,
+                                              i, file_type)
             for degree in random.sample([x for x in range(-180, 180)], amount):
                 _create_new_image_with_degree(file_path, degree, output_path)
 

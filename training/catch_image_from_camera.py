@@ -55,7 +55,7 @@ def catch(image_owner_name='unknown', project_path=''):
             # How manay faces in the screen
             detected_face_length = len(screen_encodings)
             if detected_face_length >= 1:
-                new_image_label = ('{}/{}.jpg').format(new_folder_path, i)
+                new_image_label = '{}/{}.jpg'.format(new_folder_path, i)
                 cv2.imwrite(new_image_label, frame)
                 i += 1
 
