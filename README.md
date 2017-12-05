@@ -1,3 +1,43 @@
+## AI Spider for face recognition
+
+### Dependencies
+
+You should install below as tools before you wanna start.
+
+* `python` == `2.7.x`
+* `dlib` >= `19.7`
+* `opencv`
+* `numpy`
+* `scipy` >= `0.17.0`
+* `h5py`
+
+### How to use
+
+you can run below as commands to start our project.
+
+````python
+    # To catch your face from Camera and save your image file into data/unknown folder
+    python app.py catch
+
+    # To catch your face from Camera and save your image file into data/{you name}
+    python app.py catch Brice.Chou
+
+    # To save your data folder's image training eigenvalue
+    # into database/training_encodings.hdf5
+    python app.py save
+
+    # To run our face recognition program
+    python app.py run
+
+    # To move your data folder's image file into cache folder and
+    # name it with folder name
+    python app.py move
+
+    # To detect all data folder image file's face and
+    # save the new face image file into cache folder
+    python app.py detect
+````
+
 ## Aispider project's folder structure
 
 ### `data`
@@ -15,9 +55,9 @@
   │   │   ├── Stephen111.jpg
   ````
 
-  Then, you could put any image file name into this folder. Be notice, it should only put the same person image. Don't push any other person into a same folder.
+  Then, you could put any image file with any name into this folder. Be noticed, you should only put the same person image into the same folder. Don't push any other person into a same folder. If you do, don't worry about it. We can auto split this image face into new face image file.
 
-  Finally, you can name the main image file with `1.jpg` (current default value). Or you can change the source code with other name as you wish.
+  Finally, you can name the main image file with `1.jpg`, `11.jpg`, `111.jpg` (current default value, because we can quickly name the image file). Or you can change the source code with other name as you wish.
 
 ### `cache`
 
