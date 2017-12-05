@@ -33,6 +33,9 @@ def run():
     i = lib.get_file_max_number(unknown_folder_path)
     filerd = h5py.File('./database/training_encodings.hdf5', 'r')
 
+    # Image encodings mode
+    encodings_mode = 'hog'
+
     # Temp to save predict result name
     face_names = []
 
@@ -66,7 +69,7 @@ def run():
             # in the current frame of video
             screen_locations = lib.face_locations(small_frame)
             screen_encodings = lib.face_encodings(
-                small_frame, screen_locations, 1, 'large')
+                small_frame, screen_locations, 1, encodings_mode)
             face_names = []
 
             # How manay faces in the screen
