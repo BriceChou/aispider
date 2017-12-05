@@ -126,7 +126,7 @@ def get_main_and_other_images(folder_path, main_image_list,
             other_image_list.append(path)
 
 
-def create_new_folder(folder_path):
+def create_folder_with_path(folder_path):
     # Delete the initial blank space
     folder_path = folder_path.strip()
 

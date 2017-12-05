@@ -172,7 +172,7 @@ def compare_faces(known_face_encodings, known_face_names,
     # we should use the default one to display.
     if min_match_tolerance <= 0.3:
         face_name = min_known_face_name
-    elif len(face_list) > 1:
+    elif len(face_list) > 3:
         counter = Counter(face_list).most_common(1)
         most_possible_name = counter[0][0]
         name_frequency_number = counter[0][1]
