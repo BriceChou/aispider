@@ -76,7 +76,7 @@ def save(project_path=''):
 
     # Save the other image encodings data
     for file_path in other_image_list:
-        folder_name = lib.get_folder_name(file_path)
+        folder_name = lib.get_folder_name_by_file(file_path)
         image = lib.load_image_file(file_path)
         i = lib.get_max_index_from_name_list(folder_name, training_names)
         try:

@@ -31,7 +31,7 @@ def detect(project_path=''):
                                             image_file_list, False)
 
     for image_list in image_file_list:
-        folder_name = lib.get_folder_name(image_list[0])
+        folder_name = lib.get_folder_name_by_file(image_list[0])
 
         # Create a new folder to save the new image
         new_folder_path = os.path.join(cache_folder_path, folder_name)

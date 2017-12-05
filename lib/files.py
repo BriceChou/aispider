@@ -44,8 +44,17 @@ def get_file_type(file_path):
 
 def get_max_index_from_name_list(query_name, name_list):
     pattern_string = '^{}\d+'.format(query_name)
-    match_name_list = [re.match(pattern_string, name) for name in name_list]
-    return max(_get_file_end_number(name, False) for name in match_name_list)
+    match_index_list = []
+    for name in name_list:
+        match_name = re.match(pattern_string, name)
+        if match_name:
+            index = _get_file_end_number(match_name.group(), False)
+            match_index_list.append(index)
+
+    if match_index_list:
+        return max(match_index_list)
+    else:
+        return 0
 
 
 def get_file_max_number(folder_path, folder_list=None):
