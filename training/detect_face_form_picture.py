@@ -24,14 +24,14 @@ def detect():
     # How many times to upsample the image looking for faces
     detect_times = 1
 
-    # Store the all pictures path
-    pictures_list = []
+    # Store the all image file's path
+    image_file_list = []
 
     lib.get_image_path_from_folder_group_by(data_folder_path,
-                                            pictures_list, False)
+                                            image_file_list, False)
 
-    for picture_list in pictures_list:
-        folder_name = os.path.dirname(picture_list[0]).split('/')[-1]
+    for image_list in image_file_list:
+        folder_name = lib.get_folder_name(image_list[0])
 
         # Create a new folder to save the new image
         new_folder_path = os.path.join(cache_folder_path, folder_name)
@@ -39,7 +39,7 @@ def detect():
 
         i = lib.get_file_max_number(new_folder_path)
 
-        for file_path in picture_list:
+        for file_path in image_list:
             image = lib.load_image_file(file_path)
 
             # Get one picture's face locations
