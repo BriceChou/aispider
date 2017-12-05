@@ -13,10 +13,10 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-def detect():
+def detect(project_path=''):
     # Get data's and cache's path
-    data_folder_path = os.path.abspath('data')
-    cache_folder_path = os.path.abspath('cache')
+    data_folder_path = os.path.abspath(project_path + 'data')
+    cache_folder_path = os.path.abspath(project_path + 'cache')
 
     # For more complex mode you can set it to 'cnn'
     detector_mode = 'hog'
@@ -64,4 +64,4 @@ def detect():
 
 
 if __name__ == '__main__':
-    detect()
+    detect('../')

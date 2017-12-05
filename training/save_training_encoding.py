@@ -14,11 +14,12 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-def save():
+def save(project_path=''):
     # Get data folder path
-    data_folder_path = os.path.abspath('data')
-    cache_folder_path = os.path.abspath('cache')
-    database_file_path = os.path.abspath('database/training_encodings.hdf5')
+    data_folder_path = os.path.abspath(project_path + 'data')
+    cache_folder_path = os.path.abspath(project_path + 'cache')
+    database_file_path = os.path.abspath(project_path +
+                                         'database/training_encodings.hdf5')
 
     fid = h5py.File(database_file_path, 'a')
 
@@ -78,7 +79,7 @@ def save():
     for file_path in other_image_list:
         folder_name = lib.get_folder_name(file_path)
         image = lib.load_image_file(file_path)
-        i = lib.get_max_index_from_list(file_path, training_names)
+        i = lib.get_max_index_from_name_list(folder_name, training_names)
         try:
             locations = lib.face_locations(image, detector_times,
                                            detector_mode)
@@ -137,4 +138,4 @@ def save():
 
 
 if __name__ == '__main__':
-    save()
+    save('../')

@@ -10,12 +10,12 @@ sys.path.append('..')
 import lib
 
 
-def catch(image_owner_name='unknown'):
+def catch(image_owner_name='unknown', project_path=''):
     # Set the window name
     window_name = __author__
 
     # Get data folder's path
-    data_folder_path = os.path.abspath('data')
+    data_folder_path = os.path.abspath(project_path + 'data')
 
     # If there is Camera accessory, we should use it first.
     video_capture = cv2.VideoCapture(-1)
@@ -77,4 +77,4 @@ def catch(image_owner_name='unknown'):
 
 
 if __name__ == '__main__':
-    catch()
+    catch('../')
