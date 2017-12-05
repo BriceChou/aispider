@@ -140,4 +140,4 @@ def save(project_path=''):
 
 
 if __name__ == '__main__':
-    save('../')
+    save(project_path='../')

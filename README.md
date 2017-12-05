@@ -16,11 +16,12 @@ You should install below as tools before you wanna start.
 you can run below as commands to start our project.
 
 ````python
-    # To catch your face from Camera and save your image file into data/unknown folder
-    python app.py catch
 
-    # To catch your face from Camera and save your image file into data/{you name}
+    # To catch your face from Camera and save your image file into data/{you name} folder
     python app.py catch Brice.Chou
+
+    # To auto roate the data folder image and auto {amount} times (current default times is 3)
+    python app.py roate 3
 
     # To save your data folder's image training eigenvalue
     # into database/training_encodings.hdf5
@@ -29,13 +30,14 @@ you can run below as commands to start our project.
     # To run our face recognition program
     python app.py run
 
+    # To detect all data folder image file's face and
+    # save the new face image file into cache folder
+    python app.py detect
+
     # To move your data folder's image file into cache folder and
     # name it with folder name
     python app.py move
 
-    # To detect all data folder image file's face and
-    # save the new face image file into cache folder
-    python app.py detect
 ````
 
 ## Aispider project's folder structure
@@ -82,6 +84,7 @@ you can run below as commands to start our project.
   * `detect_face_from_picture.py`: It will find the face from image file and create a new face image file. It will auto save the new face image into `cache` folder.
   * `move_picture_into_cache.py`: It will auto move all 'data' folder image into `cache` foler with new name.
   * `save_training_encoding.py`: It will auto save the image's encodings dataset into 'database/training_encodings.hdf5' file.
+  * `auto_rotate_image.py`: This tools will help you to auto rotate the image. If you have less image file or training file, you can use this script to generate more image files.
 
 ### `unknown`
   Mainly save the unknown person image. If someone is not in the training database, we would save the screenshot into this folder.

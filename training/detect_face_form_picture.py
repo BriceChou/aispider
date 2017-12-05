@@ -65,4 +65,4 @@ def detect(project_path=''):
 
 
 if __name__ == '__main__':
-    detect('../')
+    detect(project_path='../')

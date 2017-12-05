@@ -41,15 +41,18 @@ def _create_new_image_with_degree(input_file_path, degree, output_path):
     print('new rotated image: \033[0;32m%s\033[0m.' % output_path)
 
 
-def rotate(project_path=''):
+def rotate(project_path='', amount=3):
+    """ auto rotate the data folder image file
+
+    Args:
+        amount: How many rotated image you wish
+    """
+
     # Get data folder's path
     data_folder_path = os.path.abspath(project_path + 'data')
 
     # Store the all image file's path
     image_file_list = []
-
-    # How many rotated image you wish
-    amount = 3
 
     lib.get_image_path_from_folder_group_by(data_folder_path,
                                             image_file_list, False)
@@ -70,4 +73,4 @@ def rotate(project_path=''):
 
 
 if __name__ == '__main__':
-    rotate('../')
+    rotate(project_path='../')

@@ -77,4 +77,4 @@ def catch(image_owner_name='unknown', project_path=''):
 
 
 if __name__ == '__main__':
-    catch('../')
+    catch(project_path='../')

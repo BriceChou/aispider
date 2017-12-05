@@ -37,4 +37,4 @@ def move(project_path=''):
 
 
 if __name__ == '__main__':
-    move('../')
+    move(project_path='../')
