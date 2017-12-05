@@ -11,8 +11,11 @@ def _debug(str):
         print('%s\n' % str)
 
 
-def _get_file_end_number(file_path):
-    image_name = os.path.basename(file_path)
+def _get_file_end_number(file_path, is_file_path=True):
+    if is_file_path:
+        image_name = os.path.basename(file_path)
+    else:
+        image_name = file_path
 
     # If there is no any number,
     # we should set the default of value with -1
@@ -23,29 +26,37 @@ def _get_file_end_number(file_path):
     return number
 
 
-def get_folder_name(file_path):
+def get_folder_name_by_folder(folder_path):
+    return os.path.basename(folder_path)
+
+
+def get_folder_name_by_file(file_path):
     return os.path.dirname(file_path).split('/')[-1]
 
 
 def get_file_name(file_path):
-    return os.path.splitext(file_path)[0].split('/')[-1]
+    return os.path.basename(file_path).split('.')[0]
 
 
 def get_file_type(file_path):
-    return '.%s' % file_path.split('.')[-1]
+    return os.path.basename(file_path).split('.')[-1]
 
 
-def get_max_index_from_list(file_path, traget_list):
-    return max([_get_file_end_number(file_path) for path in traget_list])
+def get_max_index_from_name_list(query_name, name_list):
+    pattern_string = '^{}\d+'.format(query_name)
+    match_name_list = [re.match(pattern_string, name) for name in name_list]
+    return max(_get_file_end_number(name, False) for name in match_name_list)
 
 
-def get_file_max_number(folder_path):
-    temp_list = []
-    get_image_path_from_folder(folder_path, temp_list, False)
-    if temp_list:
-        return max([_get_file_end_number(path) for path in temp_list])
+def get_file_max_number(folder_path, folder_list=None):
+    if not folder_list:
+        folder_list = []
+        get_image_path_from_folder(folder_path, folder_list, False)
+
+    if folder_list:
+        return max([_get_file_end_number(path) for path in folder_list])
     else:
-        return -1
+        return 0
 
 
 def delete_files_by_type(folder_path, file_type):

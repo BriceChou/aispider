@@ -156,6 +156,8 @@ def main(argv=None):
                     training.catch(argv_list[1])
                 else:
                     training.catch()
+            elif 'rotate' == arg:
+                training.rotate()
         except getopt.error, msg:
             raise Usage(msg)
     except Usage, err:
