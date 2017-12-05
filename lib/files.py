@@ -23,6 +23,10 @@ def _get_file_end_number(file_path):
     return number
 
 
+def get_folder_name(file_path):
+    return os.path.dirname(file_path).split('/')[-1]
+
+
 def get_file_name(file_path):
     return os.path.splitext(file_path)[0].split('/')[-1]
 
@@ -116,7 +120,7 @@ def get_main_and_other_images(folder_path, main_image_list,
     # Set the main image to the first position
     for path in store_list:
         image_name = os.path.basename(path)
-        if '1.jpg' == image_name:
+        if re.match(r'^(1|11|111).jpg', image_name):
             main_image_list.append(path)
         else:
             other_image_list.append(path)

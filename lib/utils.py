@@ -181,7 +181,5 @@ def compare_faces(known_face_encodings, known_face_names,
         # we should also use the default one to display.
         if name_frequency_number > 1 and most_possible_name:
             face_name = most_possible_name
-    elif min_match_tolerance <= tolerance:
-        face_name = min_known_face_name
 
     return face_name

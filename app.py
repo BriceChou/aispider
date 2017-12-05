@@ -1,3 +1,5 @@
+__author__ = 'Brice Chou'
+
 import os
 import lib
 import time
@@ -60,7 +62,7 @@ while True:
             for screen_encoding in screen_encodings:
                 # Compare the locations and get the face's name
                 name = lib.compare_faces(training_eigenvalues,
-                                         training_names, screen_encoding, 0.3)
+                                         training_names, screen_encoding, 0.35)
                 face_names.append(name)
 
                 # Auto save the unknown images

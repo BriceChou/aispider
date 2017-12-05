@@ -1,7 +1,8 @@
+__author__ = 'Brice Chou'
+
 import os
 import sys
 import h5py
-import time
 from PIL import Image
 
 # Use the utf-8 coded format
@@ -41,12 +42,13 @@ min_tolerance = 0.5
 
 lib.get_main_and_other_images(data_folder_path, main_image_list,
                               other_image_list)
-
+start_index = 0
 
 # Save the main image encodings
 for image_path in main_image_list:
     file_name = lib.get_file_name(image_path)
     main_folder_name = os.path.dirname(image_path).split('/')[-1]
+    start_index += 1
     try:
         main_image = lib.load_image_file(image_path)
         main_locations = lib.face_locations(main_image, detector_times,
@@ -56,9 +58,10 @@ for image_path in main_image_list:
         if locations_length > 1:
             print('There is more than one face in %s' % image_path)
         else:
+            main_label = '{}{}'.format(main_folder_name, start_index)
             main_image_ecoding = lib.face_encodings(main_image, None,
                                                     2, encodings_mode)[0]
-            lib.save_data(fid, main_folder_name, main_image_ecoding)
+            lib.save_data(fid, main_label, main_image_ecoding)
     except Exception as e:
         error_info = 'Save main image {}: {}.\n'.format(main_folder_name, e)
         print('\033[0;31m%s\033[0m' % error_info)
@@ -71,7 +74,7 @@ for key in fid.keys():
 
 # Save the other image encodings data
 for file_path in other_image_list:
-    folder_name = os.path.dirname(file_path).split('/')[-1]
+    folder_name = lib.get_folder_name(file_path)
     image = lib.load_image_file(file_path)
     i = lib.get_max_index_from_list(file_path, training_names)
     try:

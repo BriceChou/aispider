@@ -1,1 +1,3 @@
-from .model_handler import get_simple_predictor_model, get_complex_predictor_model, get_dlib_model, get_cnn_detector_model
+__author__ = 'Brice Chou'
+
+from .model_handler import *
