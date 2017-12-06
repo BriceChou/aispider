@@ -34,7 +34,7 @@ def run():
     filerd = h5py.File('./database/training_encodings.hdf5', 'r')
 
     # Image encodings mode
-    encodings_mode = 'hog'
+    encodings_mode = 'large'
 
     # Temp to save predict result name
     face_names = []
@@ -67,13 +67,14 @@ def run():
         if process_this_frame:
             # Find all the faces and face encodings
             # in the current frame of video
-            screen_locations = lib.face_locations(small_frame)
-            screen_encodings = lib.face_encodings(
-                small_frame, screen_locations, 1, encodings_mode)
+            screen_locations = lib.face_locations(small_frame, 1,
+                                                  'hog')
+            screen_encodings = lib.face_encodings(small_frame, None,
+                                                  1, encodings_mode)
             face_names = []
 
             # How manay faces in the screen
-            detected_face_length = len(screen_encodings)
+            detected_face_length = len(screen_locations)
             info = 'We detected \033[0;32m{}\033[0m faces in the screen.\n'
             print(info.format(detected_face_length))
             if detected_face_length >= 1:
