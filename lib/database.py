@@ -27,9 +27,18 @@ def clear_all_data(fid):
 
 
 def print_all_data(fid):
-    _debug(fid.attrs.keys())
-    _debug(fid.attrs.values())
+    value_list = []
+    key_list = []
+    for key in fid.keys():
+        key_list.append(fid[key].name.split('/')[-1])
+        value_list.append(fid[key].value)
+
+    _debug('{}, {}'.format(key_id, value)
+           for key_id, value in zip(key_list, value_list))
 
 
 def print_all_data_name(fid):
-    _debug(fid.attrs.keys())
+    temp_list = []
+    for key in fid.keys():
+        temp_list.append(fid[key].name.split('/')[-1])
+    _debug(temp_list)
