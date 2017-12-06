@@ -159,9 +159,9 @@ def main(argv=None):
                     training.catch()
             elif 'rotate' == arg:
                 if 2 == len(argv_list):
-                    training.rotate(amount=argv_list[1])
+                    training.rotate(amount=int(argv_list[1]))
                 else:
-                    training.catch()
+                    training.rotate()
         except getopt.error, msg:
             raise Usage(msg)
     except Usage, err:
