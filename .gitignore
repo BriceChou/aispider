@@ -1,0 +1,14 @@
+*.py[cod]
+*$py.class
+.DS_Store
+.idea/
+data/
+cache/
+database/
+unknown/
+*.log
+*.jpg
+*.JPG
+*.png
+*.bmp
+*.hdf5
