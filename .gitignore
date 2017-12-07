@@ -6,6 +6,7 @@ data/
 cache/
 database/
 unknown/
+website/
 *.log
 *.jpg
 *.JPG
