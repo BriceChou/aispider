@@ -5,6 +5,7 @@ import heapq
 import models
 import scipy.misc
 import numpy as np
+import math
 from collections import Counter
 
 try:
@@ -183,3 +184,26 @@ def compare_faces(known_face_encodings, known_face_names,
             face_name = most_possible_name
 
     return face_name
+
+
+def get_full_time(second):
+    '''
+    @parameter 
+       second: time with full second
+    @result
+       return a full time
+    '''
+    day = 24 * 60 * 60
+    hour = 60 * 60
+    min = 60
+    if second < 60:
+        return "%d sec" % math.ceil(second)
+    elif second > day:
+        days = divmod(second, day)
+        return "%d days, %s" % (int(days[0]), get_full_time(days[1]))
+    elif second > hour:
+        hours = divmod(second, hour)
+        return '%d hours, %s' % (int(hours[0]), get_full_time(hours[1]))
+    else:
+        mins = divmod(second, min)
+        return "%d mins, %d sec" % (int(mins[0]), math.ceil(mins[1]))
